@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link rel="shortcut icon" href="#"/>
+  <title>Agregar</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <style>
+    .left-div {
+      width: 50%;
+      float: left;
+    }
+    .right-div {
+      width: 50%;
+      float:right;
+    }
+    .landmarks-table, .landmarks-table td, .landmarks-table th {
+      border: 1px solid gray;
+    }
+    .form {
+      padding: 20px;
+      border: 1px solid black;
+    }
+    .images {
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 20px;
+      border: 1px solid black;
+    }
+    /* .required:after {
+      content: " *";
+    } */
+  </style>
+</head>
+<body>
+  <div class="left-div">
+    <div class="images">
+    </div>
+
+    <div>
+      <form id="add-form" class="form" action="">
+        <br>Imágenes<br>
+        <input type="file" name="imagenes" multiple="multiple" id="images-input">
+        <br>Nombre<br>
+        <input type="text" name="nombre" class="toclear">
+        <br>Comentarios<br>
+        <input type="text" name="comentarios" class="toclear">
+        <br>ID Global<br>
+        <input type="number" name="id_global" class="toclear">
+        <br>Tienda<br>
+        <select class="select-tienda" name="tienda"></select>
+        <br>Lista<br>
+        <select class="select-lista" name="lista"></select>
+        <br><br>
+        <input type="button" name="agregar" value="Agregar" id="add-button">
+      </form>
+    </div>
+  </div>
+
+
+  <div class="right-div">
+    <div id="landmarks-form" class="form">
+      <table class="landmarks-table">
+        <tr>
+          <th>Rostro alineado</th>
+          <th>Puntos faciales</th>
+          <th>Descartar</th>
+        </tr>
+      </table>
+      <br><br>
+      <button type="button" id="put-button">Confirmar</button>
+    </div>
+  </div>
+
+
+  <script>
+    let info_listas;
+    let info_tiendas;
+    let registros = [];
+
+    var listas = new Promise(function(resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "/api/listas");
+      xhr.send();
+      xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+          resolve(JSON.parse(xhr.responseText));
+        }
+      };
+    });
+    listas.then(function(res) {
+      info_listas = lis = res.listas;
+      for (var i = 0; i < lis.length; i++) {
+        var opt = new Option(lis[i][1], lis[i][0]);
+        $(".select-lista").append(opt);
+      }
+    });
+
+    var tiendas = new Promise(function(resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "/api/tiendas");
+      xhr.send();
+      xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+          resolve(JSON.parse(xhr.responseText));
+        }
+      };
+    });
+    tiendas.then(function(res) {
+      info_tiendas = tie = res.tiendas;
+      for (var i = 0; i < tie.length; i++) {
+        var opt = new Option(tie[i][1], tie[i][0]);
+        $(".select-tienda").append(opt);
+      }
+    });
+
+    function input_image(input, div) {
+      if (input.files) {
+        var num_files = input.files.length;
+
+        for (i = 0; i < num_files; i++) {
+          var reader = new FileReader();
+          reader.onload = function(file) {
+            $(div).append(
+              $("<img/>").attr({
+                "src": file.target.result,
+                "class": "imagen-registro",
+                "height": "80px"
+              })
+            );
+          }
+          reader.readAsDataURL(input.files[i]);
+        }
+      }
+    }
+
+
+    function add_registros() {
+      return new Promise(function(resolve, reject) {
+        var formArray = $("#add-form").serializeArray();
+        dataJSON = {};
+        for (var i = 0; i < formArray.length; i++){
+          dataJSON[formArray[i]["name"]] = formArray[i]["value"];
+        }
+        dataJSON.imagenes = [];
+        $(".imagen-registro").each(function() {
+          dataJSON.imagenes.push(this.src);
+        });
+
+        for (var i = 0; i < dataJSON.imagenes.length; i++) {
+          registros.push({
+            nombre: dataJSON.nombre,
+            comentarios: dataJSON.comentarios,
+            id_global: dataJSON.id_global == "" ? "-1" : dataJSON.id_global,
+            tienda: dataJSON.tienda,
+            lista: dataJSON.lista
+          });
+        }
+
+        dataJSON.action = "add";
+        data = JSON.stringify(dataJSON);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", "/api/registros");
+        xhr.send(data);
+
+        xhr.onreadystatechange = function() {
+          if(xhr.readyState == 4 && xhr.status == 200) {
+            resolve(JSON.parse(xhr.responseText));
+          }
+        };
+      });
+    }
+
+
+    function put_registros() {
+      return new Promise(function(resolve, reject) {
+        dataJSON = {};
+        dataJSON.action = "put";
+        dataJSON.registros = [];
+        $(".landmarks-table tr").each(function(i, tr){
+        	if(i == 0) return;
+        	imagen = $($(tr).find("td")[0]).find("img")[0].src;
+
+          dataJSON.registros.push({
+            nombre: registros[i-1].nombre,
+            comentarios: registros[i-1].comentarios,
+            id_global: registros[i-1].id_global,
+            tienda: registros[i-1].tienda,
+            lista: registros[i-1].lista,
+            imagen: imagen
+          });
+
+        });
+
+        data = JSON.stringify(dataJSON);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", "/api/registros");
+        xhr.send(data);
+
+        xhr.onreadystatechange = function() {
+          if(xhr.readyState == 4 && xhr.status == 200) {
+            resolve(JSON.parse(xhr.responseText));
+          }
+        };
+      });
+    }
+
+
+    $("#add-button").click(function() {
+      var add = add_registros();
+      add.then(function(res) {
+        var ims = res.imagenes;
+        for (var i = 0; i < ims.length; i++) {
+          var crop = $("<img/>").attr({
+            "src": ims[i][0],
+            "class": "crop-registro",
+            "height": "100px"
+          });
+          var land = $("<img/>").attr({
+            "src": ims[i][1],
+            "class": "land-registro",
+            "height": "120px"
+          });
+          var dele = $("<button/>")
+            .text("Descartar")
+            .click(function() {
+              var row = $(this).closest('tr');
+              registros.splice(row.index()-1, 1);
+              $(row).remove();
+            })
+            .attr({
+              "class": "delete-button"
+            });
+
+          var tr = $("<tr>").append(
+            $("<td>").append(crop),
+            $("<td>").append(land),
+            $("<td>").append(dele)
+          );
+
+          $(".landmarks-table").append(tr);
+        }
+      });
+    });
+    $("#put-button").click(function() {
+      var put = put_registros();
+      put.then(function(res) {
+        console.log(res);
+        alert("Registros agregados exitosamente");
+
+        $(".landmarks-table tr").each(function(i, tr){
+        	if(i==0) return;
+        	$(tr).remove();
+        });
+
+        $(".imagen-registro").remove();
+        $(".toclear").val("");
+        $("#images-input").val("");
+
+        registros = [];
+
+      });
+    });
+    $("#images-input").change(function(){
+      $(".imagen-registro").remove();
+      input_image(this, ".images");
+    });
+
+  </script>
+</body>
+</html>
