@@ -1,24 +1,27 @@
-version: "3"
+version: "3.8"
 
 services:
   postgres:
     build:
-      context: .
-      dockerfile: Dockerfile_PGSQL
-
+      context: postgres
     ports:
-      - "5432:5432"
-
+      - ${POSTGRES_PORT}:5432
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=globalface
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASS}
+      - POSTGRES_DB=${PG_DB}
       - PGDATA=/tmp
-
 
   app:
     build:
-      context: .
-
+      context: app
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASS}
+      - POSTGRES_DB=${PG_DB}
     ports:
-      - "8000:8000"
+      - ${APP_PORT}:8000
+    depends_on:
+      - postgres

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link rel="shortcut icon" href="#"/>
+  <title>Eliminar</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <style>
+    .registros-table {
+      border: 1px solid gray;
+      width: 100%;
+    }
+    .registros-table td, .registros-table th {
+      border: 1px solid gray;
+    }
+  </style>
+</head>
+<body>
+  <div class="table-div">
+    <table class="registros-table">
+      <tr>
+        <th>ID Global</th>
+        <th>Nombre</th>
+        <th>Imagen</th>
+        <th>Comentarios</th>
+        <th>Tienda</th>
+        <th>Lista</th>
+        <th>Fecha de registro</th>
+        <th>Eliminar</th>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    let _listas = {};
+    let _tiendas = {};
+
+    function eliminar(id_global) {
+      return new Promise(function(resolve, reject) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("DELETE", "/api/registros");
+        xhr.send(JSON.stringify({
+          id_global: id_global
+        }));
+        xhr.onreadystatechange = function() {
+          if(xhr.readyState == 4 && xhr.status == 200) {
+            resolve(JSON.parse(xhr.responseText));
+          }
+        };
+      });
+    }
+
+    var listas = new Promise(function(resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "/api/listas");
+      xhr.send();
+      xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+          resolve(JSON.parse(xhr.responseText));
+        }
+      };
+    });
+    listas.then(function(res) {
+      lis = res.listas;
+      for (var i = 0; i < lis.length; i++) {
+        _listas[lis[i][0]] = lis[i][1];
+      }
+    });
+
+    var tiendas = new Promise(function(resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "/api/tiendas");
+      xhr.send();
+      xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+          resolve(JSON.parse(xhr.responseText));
+        }
+      };
+    });
+    tiendas.then(function(res) {
+      tie = res.tiendas;
+      for (var i = 0; i < tie.length; i++) {
+        _tiendas[tie[i][0]] = tie[i][1];
+      }
+    });
+
+    var registros = new Promise(function(resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "/api/registros");
+      xhr.send();
+      xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4 && xhr.status == 200) {
+          resolve(JSON.parse(xhr.responseText));
+        }
+      };
+    });
+    registros.then(function(res) {
+      all_regs = res.registros;
+      console.log(all_regs);
+
+      for (var i = 0; i < all_regs.length; i++) {
+        var tr = $("<tr>").append(
+          $("<td>").append(all_regs[i][0]),
+          $("<td>").append(all_regs[i][1]),
+          $("<td>").append(
+            $("<img>").attr({
+              "src": "data:image/jpeg;base64," + all_regs[i][2],
+              "height": "100px"
+            })
+          ),
+          $("<td>").append(all_regs[i][3]),
+          $("<td>").append(_tiendas[all_regs[i][4]]),
+          $("<td>").append(_listas[all_regs[i][5]]),
+          $("<td>").append(all_regs[i][6]),
+          $("<td>").append(
+            $("<button/>")
+              .text("X")
+              .click(function() {
+                var row = $(this).closest('tr');
+                idg = parseInt($($(row).find("td")[0]).html());
+
+                if (confirm("¿Desea eliminar el registro?")) {
+                  var elim = eliminar(idg);
+                  elim.then(function(e) {
+                    alert("Registro eliminado exitosamente");
+                    location.reload();
+                  });
+                }
+              })
+          )
+        );
+        $(".registros-table").append(tr);
+      }
+    });
+
+
+  </script>
+</body>
+</html>
