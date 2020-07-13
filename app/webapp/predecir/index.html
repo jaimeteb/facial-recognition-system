@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link rel="shortcut icon" href="#"/>
+  <title>Predecir</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <style>
+    .left-div {
+      width: 50%;
+      float: left;
+    }
+    .right-div {
+      width: 50%;
+      float:right;
+    }
+    .prediction-table, .prediction-table td, .prediction-table th {
+      border: 1px solid gray;
+    }
+    .form {
+      padding: 20px;
+      border: 1px solid black;
+    }
+    .images {
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 20px;
+      border: 1px solid black;
+    }
+    /* .required:after {
+      content: " *";
+    } */
+  </style>
+</head>
+<body>
+  <div class="left-div">
+    <div class="images">
+    </div>
+
+    <div>
+      <form id="add-form" class="form" action="">
+        <br>Imagen<br>
+        <input type="file" name="imagenes" id="images-input">
+        <br><br>
+        <input type="button" name="agregar" value="Predecir" id="add-button">
+      </form>
+    </div>
+  </div>
+
+
+  <div class="right-div">
+    <div class="form">
+      <table class="prediction-table">
+        <tr>
+          <th>Nombre</th>
+          <td class="prediction-pred"></td>
+        </tr>
+        <tr>
+          <th>Similitud</th>
+          <td class="prediction-sim"></td>
+        </tr>
+        <tr>
+          <th>Edad</th>
+          <td class="prediction-age"></td>
+        </tr>
+        <tr>
+          <th>Género</th>
+          <td class="prediction-gender"></td>
+        </tr>
+        <tr>
+          <th>Emoción</th>
+          <td class="prediction-emotion"></td>
+        </tr>
+      </table>
+      <br><br>
+      <b class="prediction-message"></b>
+    </div>
+  </div>
+
+
+  <script>
+    let info_listas;
+    let info_tiendas;
+    let registros = [];
+
+    function input_image(input, div) {
+      if (input.files) {
+        var num_files = input.files.length;
+
+        for (i = 0; i < num_files; i++) {
+          var reader = new FileReader();
+          reader.onload = function(file) {
+            $(div).append(
+              $("<img/>").attr({
+                "src": file.target.result,
+                "class": "imagen-registro",
+                // "height": "80px"
+              })
+            );
+          }
+          reader.readAsDataURL(input.files[i]);
+        }
+      }
+    }
+
+    function make_prediction() {
+      return new Promise(function(resolve, reject) {
+
+        data = JSON.stringify({
+          "imagen": $(".imagen-registro")[0].src.split(',')[1]
+        });
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/features");
+        xhr.send(data);
+
+        xhr.onreadystatechange = function() {
+          if(xhr.readyState == 4 && xhr.status == 200) {
+            resolve(JSON.parse(xhr.responseText));
+          }
+        };
+      });
+    }
+
+    $("#add-button").click(function() {
+      var add = make_prediction();
+      add.then(function(res) {
+
+        if (res.pred == null && res.sim == null && res.age == null && res.gender == null && res.emotion == null) {
+          $(".prediction-message").html(
+            "No se encontró un rostro."
+          );
+        } else if (res.pred == null && res.sim == null) {
+          $(".prediction-message").html(
+            "El rostro no se encuentra en la base de datos."
+          );
+        } else {
+          $(".prediction-message").html(
+            "El rostro se encuentra en la base de datos."
+          );
+        }
+
+        $(".prediction-pred").html(res.pred)
+        $(".prediction-sim").html(res.sim)
+        $(".prediction-age").html(res.age)
+        $(".prediction-gender").html(res.gender)
+        $(".prediction-emotion").html(res.emotion)
+      });
+    });
+
+    $("#images-input").change(function(){
+      $(".imagen-registro").remove();
+      input_image(this, ".images");
+    });
+
+  </script>
+</body>
+</html>
