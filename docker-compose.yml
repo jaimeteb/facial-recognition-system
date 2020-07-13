@@ -2,19 +2,19 @@ version: "3.8"
 
 services:
   postgres:
-    build:
-      context: postgres
-    ports:
-      - ${POSTGRES_PORT}:5432
+    build: postgres
     environment:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASS}
       - POSTGRES_DB=${PG_DB}
       - PGDATA=/tmp
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 
   app:
-    build:
-      context: app
+    build: app
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
@@ -23,5 +23,11 @@ services:
       - POSTGRES_DB=${PG_DB}
     ports:
       - ${APP_PORT}:8000
+    volumes:
+      - models:/srv/lib/models
     depends_on:
       - postgres
+
+volumes:
+  models:
+  postgres-data:

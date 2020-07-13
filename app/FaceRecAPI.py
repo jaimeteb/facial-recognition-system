@@ -338,9 +338,12 @@ class RegistrosHandler(DataBaseHandler):
             X = [fts for idg, fts in features]
             Y = [idg for idg, fts in features]
 
-            self.clf.train(X, Y)
-            self.clf.save()
-            logging.info("Trained and saved classifier")
+            if len(set(Y)) > 1:
+                self.clf.train(X, Y)
+                self.clf.save()
+                logging.info("Trained and saved classifier")
+            else:
+                logging.info("Not enough classes. Skipping training.")
 
 
         self.write(ret)
@@ -392,9 +395,12 @@ class RegistrosHandler(DataBaseHandler):
         X = [fts for idg, fts in features]
         Y = [idg for idg, fts in features]
 
-        self.clf.train(X, Y)
-        self.clf.save()
-        logging.info("Trained and saved classifier")
+        if len(set(Y)) > 1:
+            self.clf.train(X, Y)
+            self.clf.save()
+            logging.info("Trained and saved classifier")
+        else:
+            logging.info("Not enough classes. Skipping training.")
 
         self.write({
             "ok": ok

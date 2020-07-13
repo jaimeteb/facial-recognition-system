@@ -60,9 +60,9 @@ create table tiendas(
 );
 
 insert into tiendas
-values(default,'Plaza Carso'),
-      (default,'Plaza Inbursa'),
-      (default,'Toreo');
+values(default,'Tienda A'),
+      (default,'Tienda B'),
+      (default,'Tienda C');
 
 /*
 Función que inserta registros en la base de datos

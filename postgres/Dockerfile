@@ -1,3 +1,3 @@
 FROM postgres:10
 
-ADD ./GlobalFace.sql /docker-entrypoint-initdb.d/
+ADD ./FaceRec.sql /docker-entrypoint-initdb.d/
