@@ -10,4 +10,4 @@ install:
   - pip install -r app/requirements.txt
 
 script:
-  - python face_recognition_import_test.py
+  - python app/face_recognition_import_test.py
