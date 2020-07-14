@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/jaimeteb/facial-recognition-system.svg?branch=master)](https://travis-ci.com/jaimeteb/facial-recognition-system)
+---
+
 # Facial Recognition System
 
 This is a simple facial recognition system using Python, PostgreSQL and JavaScript, running on Docker Compose.
