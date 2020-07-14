@@ -4,10 +4,9 @@ language: python
 cache: pip
 python: 3.6
 
-before_install: cd app
 install:
-  - pip install -r requirements.txt
+  - pip install -r app/requirements.txt
 
-before_script: cd app
 script:
+  - cd app
   - python face_recognition_import_test.py
