@@ -1,13 +1,13 @@
 sudo: false
 
 language: python
-
 cache: pip
-
 python: 3.6
 
+before_install: cd app
 install:
-  - pip install -r app/requirements.txt
+  - pip install -r requirements.txt
 
+before_script: cd app
 script:
-  - python app/face_recognition_import_test.py
+  - python face_recognition_import_test.py

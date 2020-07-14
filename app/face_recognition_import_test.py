@@ -3,15 +3,15 @@ import logging
 
 if __name__ == "__main__":
     try:
-        from app.lib.Augmentate import seq
-        from app.lib.FaceDetector import FaceDetectorDlib
-        from app.lib.FaceNetKeras import get_features, get_features_tolist
-        from app.lib.FaceAlign import get_aligned_face, get_landmarks_visualization
-        from app.lib.SSRNET_model import SSR_net, SSR_net_general
-        from app.lib.emotion_estimator import get_emotion_estimator_model
+        from lib.Augmentate import seq
+        from lib.FaceDetector import FaceDetectorDlib
+        from lib.FaceNetKeras import get_features, get_features_tolist
+        from lib.FaceAlign import get_aligned_face, get_landmarks_visualization
+        from lib.SSRNET_model import SSR_net, SSR_net_general
+        from lib.emotion_estimator import get_emotion_estimator_model
 
-        from app.lib.SVMClassifier import Classifier as SVMClassifier
-        from app.lib.TreeClassifier import Classifier as TreeClassifier
+        from lib.SVMClassifier import Classifier as SVMClassifier
+        from lib.TreeClassifier import Classifier as TreeClassifier
 
         svm_clf = SVMClassifier()
         svm_clf.load()
