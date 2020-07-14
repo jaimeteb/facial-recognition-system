@@ -414,11 +414,12 @@ if __name__ == '__main__':
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--classifier",
-                        "-c",
-                        help="Classifier (tree/svm)",
-                        type=str,
-                        default="svm")
+    parser.add_argument(
+        "--classifier",
+        "-c",
+        help="Classifier (tree/svm)",
+        type=str,
+        default="svm")
     args = parser.parse_args()
 
     application = web.Application([

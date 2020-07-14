@@ -11,4 +11,4 @@ WORKDIR /srv
 
 EXPOSE 8000
 
-CMD ["python", "FaceRecAPI.py"]
+CMD ["python", "face_recognition_api.py"]

@@ -48,7 +48,7 @@ In order to register new faces, run the project and go to **localhost:8000/agreg
 
 You can add multiple images from your computer and provide additional information about the subject.
 
-Click on "Agregar" in order to get a visualization of the facial landmarks of the images provided. You can then discard the images that could not be useful or that have the landmarks misplaced.
+Click on "Agregar" in order to get a visualization of the facial landmarks of the images provided. You can then discard the images that could not be useful or the ones that have misplaced landmarks.
 
 ![Register 2](/utils/images/registrar2.png)
 
@@ -56,16 +56,32 @@ Then click on "Confirmar" to add the new faces to the database.
 
 ## Delete
 
-In order to register new faces, go to **localhost:8000/eliminar**.
+In order to delete faces, go to **localhost:8000/eliminar**.
 
-You will be prompted with the entries that you had previously registered, as well as their details. You can click on the buttons under "Eliminar" to delete them.
+You will be prompted with the entries that you had previously registered, as well as their details. Click on the buttons under "Eliminar" to delete them.
 
 ![Delete](/utils/images/eliminar.png)
 
 ## Predict
 
-In order to predict a new image, go to **localhost:8000/predecir**.
+To perform a prediction on a new image, go to **localhost:8000/predecir**.
 
 Upload an image from your computer and click on "Predecir". The results of the prediction (name, similarity, age, gender and emotion) will be shown on the right.
 
 ![Predict](/utils/images/predecir.png)
+
+## References
+
+| Component                 | Reference                                                                     |
+|---------------------------|-------------------------------------------------------------------------------|
+| Face embedding extraction | [Keras-OpenFace](https://github.com/iwantooxxoox/Keras-OpenFace)              |
+| Data augmentation         | [Imgaug](https://github.com/aleju/imgaug)                                     |
+| Emotion estimation        | [Emotion-detection](https://github.com/atulapra/Emotion-detection)            |
+| Age and gender prediction | [Age-Gender-Predictor](https://github.com/dandynaufaldi/Age-Gender-Predictor) |
+
+
+## TODO
+* Check for previous instances of a new face
+* Improve frontend
+* Translate everything to english
+* Write API specification
